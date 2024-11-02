@@ -4,9 +4,11 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.RemoteViews
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -61,12 +63,18 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // Tạo preview
+        val remoteViews = RemoteViews(packageName, R.layout.widget)
+        remoteViews.setTextViewText(R.id.name, widgetNameString)
+
+        // Tạo PendingIntent với timestamp để đảm bảo uniqueness
         val successCallback = DemoWidgetPinnedReceiver.getPendingIntent(this, widgetNameString)
 
-        val remoteViews = DemoWidgetProvider.getRemoteViews(this, widgetNameString)
+        // Request pin widget
         val bundle = Bundle()
         bundle.putParcelable(AppWidgetManager.EXTRA_APPWIDGET_PREVIEW, remoteViews)
-
         appWidgetManager.requestPinAppWidget(provider, bundle, successCallback)
+
+        Log.d("WidgetDebug", "Requested pin widget with name: $widgetNameString")
     }
 }
